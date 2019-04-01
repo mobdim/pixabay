@@ -1,0 +1,39 @@
+### Headers settings
+company: pixabay
+
+### Xcode project settings
+project_name: pixabay
+xcodeproj_path: pixabay.xcodeproj
+prefix: 
+
+### Code generation settings section
+# The main project target name
+project_target: pixabay
+
+# The file path for new modules
+project_file_path: pixabay/Modules
+
+# The Xcode group path to new modules
+project_group_path: pixabay/Modules
+
+### Tests generation settings section
+# The tests target name
+test_target: pixabayTests
+
+# The file path for new tests
+test_file_path: pixabayTests/Modules
+
+# The Xcode group path to new tests
+test_group_path: pixabayTests/Modules
+
+### Dependencies settings section
+podfile_path: .
+cartfile_path: .
+
+### Templates
+templates:
+- {name: mobdim_swift, local: 'Generamba/mobdim_swift'}
+#- {name: mobdim_test_swift, local: 'Generamba/mobdim_test_swift'}
+#- {name: local_template_name, local: 'absolute/file/path'}
+#- {name: remote_template_name, git: 'https://github.com/igrekde/remote_template'}
+#- {name: catalog_template_name}

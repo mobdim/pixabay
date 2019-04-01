@@ -1,0 +1,45 @@
+# Template information section
+name: mobdim_swift
+summary: mobdim swift viper
+author: Dmitry Zadoroghniy
+version: 2.0.0
+license: 
+
+# The declarations for code files
+code_files:
+
+# HeaderMo
+- {name: Header/HeaderIO.swift, path: Code/Header/HeaderIO.swift.liquid}
+- {name: Header/Header.swift, path: Code/Header/Header.swift.liquid}
+
+# Model
+- {name: Model/Model.swift, path: Code/Model/Model.swift.liquid}
+
+# Presenter
+- {name: Presenter/Presenter.swift, path: Code/Presenter/Presenter.swift.liquid}
+
+# Interactor
+- {name: Interactor/InteractorIO.swift, path: Code/Interactor/InteractorIO.swift.liquid}
+- {name: Interactor/Interactor.swift, path: Code/Interactor/Interactor.swift.liquid}
+
+# ViewController
+- {name: ViewController/ViewControllerIO.swift, path: Code/ViewController/ViewControllerIO.swift.liquid}
+- {name: ViewController/ViewController.swift, path: Code/ViewController/ViewController.swift.liquid}
+
+# The declarations for test files
+test_files:
+
+# Header
+- {name: Header/HeaderTest.swift, path: Test/Header/HeaderTest.swift.liquid}
+
+# Presenter
+- {name: Presenter/PresenterTest.swift, path: Test/Presenter/PresenterTest.swift.liquid}
+
+# Interactor
+- {name: Interactor/InteractorTest.swift, path: Test/Interactor/InteractorTest.swift.liquid}
+
+# ViewController
+- {name: ViewController/ViewControllerTest.swift, path: Test/ViewController/ViewControllerTest.swift.liquid}
+
+# Template dependencies
+dependencies:

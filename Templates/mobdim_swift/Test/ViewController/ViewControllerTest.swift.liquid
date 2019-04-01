@@ -1,0 +1,38 @@
+{% include 'header' %}
+
+import Foundation
+
+import Quick
+import Nimble
+@testable import {{ module_info.project_name }}
+
+
+fileprivate class MockPresenter: {{ prefix }}{{ module_info.name }}ViewControllerOutput {
+    
+    private(set) var was_didReady: Bool = false
+    
+    func didReady() {
+        was_didReady = true
+    }
+}
+
+class {{ prefix }}{{ module_info.name }}ViewControllerSpec: QuickSpec {
+    override func spec() {
+        
+        var sut: {{ prefix }}{{ module_info.name }}ViewController?
+        var presenter: MockPresenter?
+        
+        beforeEach {
+            presenter = MockPresenter()
+            expect(presenter).toNot(beNil())
+            sut = {{ prefix }}{{ module_info.name }}ViewController(presenter: presenter!, nibName: "{{ prefix }}{{ module_info.name }}ViewController", bundle: Bundle(for: {{ prefix }}{{ module_info.name }}ViewController.self))
+            expect(sut).toNot(beNil())
+            expect(sut?.view).toNot(beNil())
+        }
+        
+        it("viewDidLoad") {
+            expect(presenter?.was_didReady).to(beTrue())
+        }
+
+    }
+}

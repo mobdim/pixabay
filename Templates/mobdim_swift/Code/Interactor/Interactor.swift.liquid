@@ -1,0 +1,17 @@
+{% include 'header' %}
+
+import Foundation
+
+class {{ prefix }}{{ module_info.name }}Interactor {
+  let presenter: {{ prefix }}{{ module_info.name }}InteractorOutput
+    
+  init(presenter: {{ prefix }}{{ module_info.name }}InteractorOutput) {
+    self.presenter = presenter
+  }
+}
+
+// MARK: - {{ prefix }}{{ module_info.name }}InteractorInput
+
+extension {{ prefix }}{{ module_info.name }}Interactor: {{ prefix }}{{ module_info.name }}InteractorInput {
+
+}

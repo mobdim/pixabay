@@ -1,0 +1,25 @@
+{% include 'header' %}
+
+import Foundation
+
+import Quick
+import Nimble
+@testable import {{ module_info.project_name }}
+
+fileprivate class MockPresenter: {{ prefix }}{{ module_info.name }}InteractorOutput {
+    
+}
+
+class {{ prefix }}{{ module_info.name }}InteractorSpec: QuickSpec {
+    override func spec() {
+        var sut: {{ prefix }}{{ module_info.name }}Interactor?
+        var presenter: MockPresenter?
+        
+        beforeEach {
+            presenter = MockPresenter()
+            expect(presenter).toNot(beNil())
+            sut = {{ prefix }}{{ module_info.name }}Interactor(presenter: presenter!)
+            expect(sut).toNot(beNil())
+        }
+    }
+}
