@@ -1,0 +1,11 @@
+{% include 'header' %}
+
+import Foundation
+
+protocol {{ prefix }}{{ module_info.name }}ViewControllerInput {
+
+}
+
+protocol {{ prefix }}{{ module_info.name }}ViewControllerOutput {
+  func didReady()
+}

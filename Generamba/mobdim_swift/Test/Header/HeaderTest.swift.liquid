@@ -1,0 +1,53 @@
+{% include 'header' %}
+
+import Foundation
+
+import Quick
+import Nimble
+@testable import {{ module_info.project_name }}
+
+fileprivate class MockRoot: {{ prefix }}{{ module_info.name }}HeaderOutput {
+    
+}
+
+class {{ prefix }}{{ module_info.name }}HeaderSpec: QuickSpec {
+    override func spec() {
+        
+        var root: MockRoot?
+        var sut: {{ prefix }}{{ module_info.name }}Header?
+        
+        beforeEach {
+            root = MockRoot()
+            expect(root).toNot(beNil())
+            sut = {{ prefix }}{{ module_info.name }}Header(root: root!)
+            expect(sut).toNot(beNil())
+        }
+        describe("{{ prefix }}{{ module_info.name }}Header properties") {
+            
+            it("controller must not nil") {
+                expect(sut?.controller).toNot(beNil())
+                expect(sut?.controller.presenter).toNot(beNil())
+            }
+            
+            it("current controller must not be nil") {
+                expect(sut?.currentController).toNot(beNil())
+            }
+            
+            it("currentController must be equal to controller") {
+                expect(sut?.controller == sut?.currentController).to(beTrue())
+            }
+            
+            it("presenter must not nil") {
+                expect(sut?.presenter).toNot(beNil())
+                expect(sut?.presenter.controller).toNot(beNil())
+                expect(sut?.presenter.interactor).toNot(beNil())
+            }
+            
+            it("interactor must not nil") {
+                expect(sut?.interactor).toNot(beNil())
+                expect(sut?.interactor.presenter).toNot(beNil())
+            }
+            
+        }
+    }
+}

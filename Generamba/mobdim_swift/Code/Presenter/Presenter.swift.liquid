@@ -1,0 +1,41 @@
+{% include 'header' %}
+
+import Foundation
+
+class {{ prefix }}{{ module_info.name }}Presenter {
+
+  let root: {{ prefix }}{{ module_info.name }}HeaderOutput
+  var controller: {{ prefix }}{{ module_info.name }}ViewControllerInput {
+    return __controller!
+  }
+  var interactor: {{ prefix }}{{ module_info.name }}InteractorInput {
+    return __interator!
+  }
+
+  private var __controller: {{ prefix }}{{ module_info.name }}ViewControllerInput?
+  private var __interator: {{ prefix }}{{ module_info.name }}InteractorInput?
+    
+  func __set_missing(controller: {{ prefix }}{{ module_info.name }}ViewControllerInput, interactor: {{ prefix }}{{ module_info.name }}InteractorInput) {
+    __controller = controller
+    __interator = interactor
+  }
+    
+  init(root: {{ prefix }}{{ module_info.name }}HeaderOutput) {
+    self.root = root
+  }
+}
+
+// MARK: - {{ prefix }}{{ module_info.name }}InteractorOutput
+
+extension {{ prefix }}{{ module_info.name }}Presenter: {{ prefix }}{{ module_info.name }}InteractorOutput {
+
+}
+
+// MARK: - {{ prefix }}{{ module_info.name }}ViewControllerOutput
+
+extension {{ prefix }}{{ module_info.name }}Presenter: {{ prefix }}{{ module_info.name }}ViewControllerOutput {
+  
+  func didReady() {
+
+  }
+}

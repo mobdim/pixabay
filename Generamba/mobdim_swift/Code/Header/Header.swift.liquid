@@ -1,0 +1,27 @@
+{% include 'header' %}
+
+import UIKit
+
+class {{ prefix }}{{ module_info.name }}Header {
+
+  let controller: {{ prefix }}{{ module_info.name }}ViewController
+  let presenter: {{ prefix }}{{ module_info.name }}Presenter
+  let interactor: {{ prefix }}{{ module_info.name }}Interactor
+
+  init(root: {{ prefix }}{{ module_info.name }}HeaderOutput) {
+    presenter = {{ prefix }}{{ module_info.name }}Presenter(root: root)
+    interactor = {{ prefix }}{{ module_info.name }}Interactor(presenter: presenter)
+    controller = {{ prefix }}{{ module_info.name }}ViewController(presenter: presenter, nibName: nil, bundle: nil)
+    presenter.__set_missing(controller: controller, interactor: interactor)
+  }
+
+  var currentController: UIViewController {
+    return controller
+  }
+}
+
+// MARK: - {{ prefix }}{{ module_info.name }}HeaderInput
+
+extension {{ prefix }}{{ module_info.name }}Header: {{ prefix }}{{ module_info.name }}HeaderInput {
+
+}
