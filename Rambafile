@@ -18,17 +18,17 @@ project_group_path: pixabay/Modules
 
 ### Tests generation settings section
 # The tests target name
-test_target: pixabayTests
+#test_target: pixabayTests
 
 # The file path for new tests
-test_file_path: pixabayTests/Modules
+#test_file_path: pixabayTests/Modules
 
 # The Xcode group path to new tests
-test_group_path: pixabayTests/Modules
+#test_group_path: pixabayTests/Modules
 
 ### Dependencies settings section
-podfile_path: .
-cartfile_path: .
+#podfile_path: .
+#cartfile_path: .
 
 ### Templates
 templates:
