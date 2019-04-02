@@ -9,9 +9,10 @@
 import Foundation
 
 protocol SearchInteractorInput {
-
+  func search(text: String)
 }
 
 protocol SearchInteractorOutput {
-
+  func didSearchSuccess(json: Dictionary<String, Any?>)
+  func didSearchFailure(message: String?)
 }

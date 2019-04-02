@@ -38,7 +38,7 @@ class SearchViewController: UIViewController {
     searchBar.showsCancelButton = false
     navigationItem.titleView = searchBar
     searchBar.delegate = self
-    searchBar.becomeFirstResponder()
+    searchBar.returnKeyType = .search
     
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.backgroundColor = .blue
@@ -70,7 +70,9 @@ class SearchViewController: UIViewController {
 }
 
 extension SearchViewController: UISearchBarDelegate {
-  
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    presenter.didClickSearchButton(searchText: searchBar.text)
+  }
 }
 
 // MARK: - SearchViewControllerInput

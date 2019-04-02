@@ -14,4 +14,6 @@ protocol SearchViewControllerInput {
 
 protocol SearchViewControllerOutput {
   func didReady()
+  
+  func didClickSearchButton(searchText: String?)
 }

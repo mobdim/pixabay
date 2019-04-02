@@ -34,12 +34,29 @@ class SearchPresenter {
 // MARK: - SearchInteractorOutput
 
 extension SearchPresenter: SearchInteractorOutput {
-
+  func didSearchFailure(message: String?) {
+    print("fail: \(message ?? "error")")
+  }
+  
+  func didSearchSuccess(json: Dictionary<String, Any?>) {
+    print("success: \(json)")
+  }
 }
 
 // MARK: - SearchViewControllerOutput
 
 extension SearchPresenter: SearchViewControllerOutput {
+  func didClickSearchButton(searchText: String?) {
+    
+    guard let searchText = searchText else {
+      return
+    }
+    
+    interactor.search(text: searchText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).replacingOccurrences(of: " ", with: "+"))
+    
+    controller.setSearchBar(focus: false)
+  }
+  
   
   func didReady() {
     controller.setSearchBar(focus: true)
