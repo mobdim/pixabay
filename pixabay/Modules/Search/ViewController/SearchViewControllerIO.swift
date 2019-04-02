@@ -11,7 +11,9 @@ import Foundation
 protocol SearchViewControllerInput {
   func setSearchBar(focus: Bool)
   func set(models data: [SearchModel])
+  func removeAllModels()
   
+  func reloadRows(indexes: [IndexPath])
   func reloadData()
 }
 
@@ -19,4 +21,5 @@ protocol SearchViewControllerOutput {
   func didReady()
   
   func didClickSearchButton(searchText: String?)
+  func didCell(row index: Int)
 }

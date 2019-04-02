@@ -9,7 +9,7 @@
 import Foundation
 
 protocol SearchInteractorInput {
-  func search(text: String)
+  func search(text: String, page: Int, per_page: Int)
 }
 
 protocol SearchInteractorOutput {

@@ -19,8 +19,10 @@ class SearchInteractor {
 // MARK: - SearchInteractorInput
 
 extension SearchInteractor: SearchInteractorInput {
-  func search(text: String) {
-    let urlString = "https://pixabay.com/api/?key=12057211-da8b15ee83b85dc84156454c8&q=\(text)&image_type=photo&pretty=true&page=1&per_page=10"
+  func search(text: String, page: Int, per_page: Int) {
+    let urlString = "https://pixabay.com/api/?key=12057211-da8b15ee83b85dc84156454c8&q=\(text)&image_type=photo&pretty=true&page=\(page)&per_page=\(per_page)"
+    
+    print("search: \(urlString)")
     
     guard let url = URL(string: urlString) else {
       presenter.didSearchFailure(message: "invalid URL")

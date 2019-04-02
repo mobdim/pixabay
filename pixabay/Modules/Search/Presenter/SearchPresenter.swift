@@ -30,8 +30,10 @@ class SearchPresenter {
     self.root = root
   }
   
-  
+  fileprivate var searchText = ""
   var data = [SearchModel]()
+  static let per_page = 20
+  var currentPage = 1
 }
 
 // MARK: - SearchInteractorOutput
@@ -42,15 +44,23 @@ extension SearchPresenter: SearchInteractorOutput {
   }
   
   func didSearchSuccess(json: [[String: AnyObject]]) {
+    var new_data = [SearchModel]()
     for item in json {
-      guard let tags = item["tags"] as? String, let imageUrl = item["largeImageURL"] as? String else {
+      guard let tags = item["tags"] as? String, let imageUrl = item["largeImageURL"] as? String, let id = item["id"] as? Int else {
         continue
       }
-      data.append(SearchModel(tags: tags, imageUrl: imageUrl))
+      new_data.append(SearchModel(tags: tags, imageUrl: imageUrl, id: id))
     }
+    print("currenModels: \(data.count), new_models: \(new_data.count)")
+    data += new_data
     controller.set(models: data)
+    let indexesToReload = getReloadIndexes(from: new_data)
     DispatchQueue.main.async {
-      self.controller.reloadData()
+      if self.currentPage == 1 {
+        self.controller.reloadData()
+      } else {
+        self.controller.reloadRows(indexes: indexesToReload)
+      }
     }
     
   }
@@ -59,13 +69,25 @@ extension SearchPresenter: SearchInteractorOutput {
 // MARK: - SearchViewControllerOutput
 
 extension SearchPresenter: SearchViewControllerOutput {
+  func didCell(row index: Int) {
+    if (data.count - index < 5 && data.count/SearchPresenter.per_page == currentPage) {
+      currentPage += 1
+      interactor.search(text: self.searchText, page: currentPage, per_page: SearchPresenter.per_page)
+    }
+    
+  }
+  
   func didClickSearchButton(searchText: String?) {
     
     guard let searchText = searchText else {
       return
     }
-    
-    interactor.search(text: searchText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).replacingOccurrences(of: " ", with: "+"))
+    data.removeAll()
+    controller.removeAllModels()
+    self.controller.reloadData()
+    currentPage = 1
+    self.searchText = searchText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).replacingOccurrences(of: " ", with: "+")
+    interactor.search(text: self.searchText, page: currentPage, per_page: SearchPresenter.per_page)
     
     controller.setSearchBar(focus: false)
   }
@@ -73,5 +95,14 @@ extension SearchPresenter: SearchViewControllerOutput {
   
   func didReady() {
     controller.setSearchBar(focus: true)
+  }
+}
+
+extension SearchPresenter {
+  func getReloadIndexes(from new_data: [SearchModel]) -> [IndexPath] {
+    let startIndex = data.count - new_data.count
+    let endIndex = startIndex + new_data.count
+    
+    return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
   }
 }

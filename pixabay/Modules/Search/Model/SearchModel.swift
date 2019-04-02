@@ -11,4 +11,5 @@ import Foundation
 struct SearchModel {
   let tags: String
   let imageUrl: String
+  let id: Int
 }

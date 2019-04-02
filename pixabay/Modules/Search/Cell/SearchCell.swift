@@ -38,7 +38,7 @@ extension SearchCell {
         DispatchQueue.main.async {
           self.imageView?.image = UIImage(data: data, scale: 1.0)
           self.setNeedsLayout()
-          print("loaded image: \(data)")
+//          print("loaded image: \(data)")
         }
       case .failure(let error):
         print(error.localizedDescription)

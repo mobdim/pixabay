@@ -75,15 +75,19 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    print("numberOfRowsInSection \(data.count)")
     return data.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
     guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchCell.id) as? SearchCell else {
       return UITableViewCell(frame: .zero)
     }
     
     cell.set(model: data[indexPath.row])
+    
+    presenter.didCell(row: indexPath.row)
     
     return cell
   }
@@ -98,8 +102,18 @@ extension SearchViewController: UISearchBarDelegate {
 // MARK: - SearchViewControllerInput
 
 extension SearchViewController: SearchViewControllerInput {
+  func removeAllModels() {
+    self.data.removeAll()
+  }
+  
   func reloadData() {
     tableView.reloadData()
+  }
+  
+  func reloadRows(indexes: [IndexPath]) {
+    let indexPathsToReload = visibleIndexPathsToReload(intersecting: indexes)
+    print("indexPathsToReload: \(indexPathsToReload)")
+    tableView.reloadRows(at: indexPathsToReload, with: .automatic)
   }
   
   func set(models data: [SearchModel]) {
@@ -113,6 +127,12 @@ extension SearchViewController: SearchViewControllerInput {
       searchBar.resignFirstResponder()
     }
   }
-  
+}
 
+private extension SearchViewController {
+  func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
+    let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
+    let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
+    return Array(indexPathsIntersection)
+  }
 }
