@@ -41,11 +41,11 @@ extension SearchInteractor: SearchInteractorInput {
       }
       do {
         let jsonObj = try JSONSerialization.jsonObject(with: data!)
-        guard let json = jsonObj as? [String: AnyObject], let data = json["hits"] as? [[String: AnyObject]] else {
+        guard let json = jsonObj as? [String: AnyObject], let data = json["hits"] as? [[String: AnyObject]], let totalHits = json["totalHits"] as? Int else {
           self.presenter.didSearchFailure(message: "json error!")
           return
         }
-        self.presenter.didSearchSuccess(json: data)
+        self.presenter.didSearchSuccess(json: data, totalHits: totalHits)
       } catch {
         self.presenter.didSearchFailure(message: "fail to parse json!")
       }

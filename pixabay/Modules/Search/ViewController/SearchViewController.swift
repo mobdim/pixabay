@@ -15,7 +15,8 @@ class SearchViewController: UIViewController {
   let searchBar = UISearchBar()
   let tableView: UITableView
   
-  fileprivate var data = [SearchModel]()
+  private var data = [SearchModel]()
+  private var total = 0
   
   override func loadView() {
     super.loadView()
@@ -46,6 +47,7 @@ class SearchViewController: UIViewController {
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.backgroundColor = .white
     tableView.dataSource = self
+    tableView.prefetchDataSource = self
     view.addSubview(tableView)
     if #available(iOS 11, *) {
       tableView.contentInsetAdjustmentBehavior = .never
@@ -75,8 +77,7 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    print("numberOfRowsInSection \(data.count)")
-    return data.count
+    return total
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -85,13 +86,27 @@ extension SearchViewController: UITableViewDataSource {
       return UITableViewCell(frame: .zero)
     }
     
-    cell.set(model: data[indexPath.row])
+    cell.delegate = self
     
-    presenter.didCell(row: indexPath.row)
+    if isLoadingCell(for: indexPath) {
+      cell.configure(model: .none, indexPath: indexPath)
+    } else {
+      cell.configure(model: .some(model: data[indexPath.row]), indexPath: indexPath)
+    }
     
     return cell
   }
 }
+
+extension SearchViewController: UITableViewDataSourcePrefetching {
+  func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+    print("prefetchRowsAt \(indexPaths)")
+    if indexPaths.contains(where: isLoadingCell) {
+      presenter.didNeedFetch()
+    }
+  }
+}
+
 
 extension SearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -99,9 +114,30 @@ extension SearchViewController: UISearchBarDelegate {
   }
 }
 
+extension SearchViewController: SearchCellProtocol {
+  func didLoaded(indexPath: IndexPath, image: UIImage) {
+    print("didLoaded: \(indexPath) \(image)")
+//    guard tableView.indexPathsForVisibleRows!.contains(indexPath) else {
+//      return
+//    }
+//    if let cell = tableView.cellForRow(at: indexPath) as? SearchCell {
+//      print("loaded: \(indexPath)")
+//
+////      cell.setNeedsLayout()
+//    }
+  }
+  
+  
+}
+
+
 // MARK: - SearchViewControllerInput
 
 extension SearchViewController: SearchViewControllerInput {
+  func set(models total: Int) {
+    self.total = total
+  }
+  
   func removeAllModels() {
     self.data.removeAll()
   }
@@ -111,9 +147,12 @@ extension SearchViewController: SearchViewControllerInput {
   }
   
   func reloadRows(indexes: [IndexPath]) {
+    print("reloadRows: \(indexes)")
     let indexPathsToReload = visibleIndexPathsToReload(intersecting: indexes)
     print("indexPathsToReload: \(indexPathsToReload)")
-    tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+    if indexPathsToReload.count > 0 {
+      tableView.reloadRows(at: indexPathsToReload, with: .none)
+    }
   }
   
   func set(models data: [SearchModel]) {
@@ -130,9 +169,16 @@ extension SearchViewController: SearchViewControllerInput {
 }
 
 private extension SearchViewController {
+  
+  func isLoadingCell(for indexPath: IndexPath) -> Bool {
+    return indexPath.row >= data.count
+  }
+  
   func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
     let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
+    print("indexPathsForVisibleRows: \(indexPathsForVisibleRows)")
     let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
+    print("indexPathsIntersection: \(indexPathsIntersection)")
     return Array(indexPathsIntersection)
   }
 }

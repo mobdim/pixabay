@@ -43,7 +43,7 @@ extension SearchPresenter: SearchInteractorOutput {
     print("fail: \(message ?? "error")")
   }
   
-  func didSearchSuccess(json: [[String: AnyObject]]) {
+  func didSearchSuccess(json: [[String: AnyObject]], totalHits: Int) {
     var new_data = [SearchModel]()
     for item in json {
       guard let tags = item["tags"] as? String, let imageUrl = item["largeImageURL"] as? String, let id = item["id"] as? Int else {
@@ -51,11 +51,14 @@ extension SearchPresenter: SearchInteractorOutput {
       }
       new_data.append(SearchModel(tags: tags, imageUrl: imageUrl, id: id))
     }
-    print("currenModels: \(data.count), new_models: \(new_data.count)")
+    
     data += new_data
+    controller.set(models: totalHits)
     controller.set(models: data)
     let indexesToReload = getReloadIndexes(from: new_data)
+    
     DispatchQueue.main.async {
+//      self.controller.reloadRows(indexes: indexesToReload)
       if self.currentPage == 1 {
         self.controller.reloadData()
       } else {
@@ -69,14 +72,11 @@ extension SearchPresenter: SearchInteractorOutput {
 // MARK: - SearchViewControllerOutput
 
 extension SearchPresenter: SearchViewControllerOutput {
-  func didCell(row index: Int) {
-    if (data.count - index < 5 && data.count/SearchPresenter.per_page == currentPage) {
-      currentPage += 1
-      interactor.search(text: self.searchText, page: currentPage, per_page: SearchPresenter.per_page)
-    }
-    
+  func didNeedFetch() {
+    currentPage += 1
+    interactor.search(text: self.searchText, page: currentPage, per_page: SearchPresenter.per_page)
   }
-  
+    
   func didClickSearchButton(searchText: String?) {
     
     guard let searchText = searchText else {
