@@ -9,6 +9,6 @@
 import Foundation
 
 struct SearchModel {
-  let tags: String?
-  let imageUrl: String?
+  let tags: String
+  let imageUrl: String
 }

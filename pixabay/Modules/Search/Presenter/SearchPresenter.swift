@@ -29,6 +29,9 @@ class SearchPresenter {
   init(root: SearchHeaderOutput) {
     self.root = root
   }
+  
+  
+  var data = [SearchModel]()
 }
 
 // MARK: - SearchInteractorOutput
@@ -39,7 +42,17 @@ extension SearchPresenter: SearchInteractorOutput {
   }
   
   func didSearchSuccess(json: [[String: AnyObject]]) {
-    print("success: \(json)")
+    for item in json {
+      guard let tags = item["tags"] as? String, let imageUrl = item["largeImageURL"] as? String else {
+        continue
+      }
+      data.append(SearchModel(tags: tags, imageUrl: imageUrl))
+    }
+    controller.set(models: data)
+    DispatchQueue.main.async {
+      self.controller.reloadData()
+    }
+    
   }
 }
 

@@ -27,7 +27,7 @@ extension SearchInteractor: SearchInteractorInput {
       return
     }
     let urlRequest = URLRequest(url: url)
-    let task = URLSession.shared.dataTask(with: urlRequest) { [weak self] (data, responce, error) in
+    let task = URLSession.shared.dataTask(with: urlRequest) { [weak self] (data, _, error) in
       
       guard let self = self else {
         return
@@ -35,6 +35,7 @@ extension SearchInteractor: SearchInteractorInput {
       
       if error != nil {
         self.presenter.didSearchFailure(message: "request fail")
+        return
       }
       do {
         let jsonObj = try JSONSerialization.jsonObject(with: data!)
