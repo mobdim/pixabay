@@ -9,7 +9,7 @@
 import Foundation
 
 protocol SearchViewControllerInput {
-
+  func setSearchBar(focus: Bool)
 }
 
 protocol SearchViewControllerOutput {

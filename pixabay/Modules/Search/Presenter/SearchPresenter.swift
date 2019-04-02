@@ -42,6 +42,6 @@ extension SearchPresenter: SearchInteractorOutput {
 extension SearchPresenter: SearchViewControllerOutput {
   
   func didReady() {
-
+    controller.setSearchBar(focus: true)
   }
 }
