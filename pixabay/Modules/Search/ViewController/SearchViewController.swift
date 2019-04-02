@@ -13,7 +13,9 @@ class SearchViewController: UIViewController {
   let presenter: SearchViewControllerOutput
   
   let searchBar = UISearchBar()
-  let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+  let collectionView: UICollectionView
+  
+  fileprivate var data = [SearchModel]()
   
   override func loadView() {
     super.loadView()
@@ -24,6 +26,9 @@ class SearchViewController: UIViewController {
   
   init(presenter: SearchViewControllerOutput, nibName: String?, bundle: Bundle?) {
     self.presenter = presenter
+    let layout = UICollectionViewFlowLayout()
+    layout.scrollDirection = .vertical
+    collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     super.init(nibName: nibName, bundle: bundle)
   }
     
@@ -33,7 +38,6 @@ class SearchViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    
     
     searchBar.showsCancelButton = false
     navigationItem.titleView = searchBar
@@ -69,6 +73,18 @@ class SearchViewController: UIViewController {
   
 }
 
+extension SearchViewController: UICollectionViewDataSource {
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return data.count
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    
+  }
+  
+  
+}
+
 extension SearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     presenter.didClickSearchButton(searchText: searchBar.text)
@@ -78,6 +94,10 @@ extension SearchViewController: UISearchBarDelegate {
 // MARK: - SearchViewControllerInput
 
 extension SearchViewController: SearchViewControllerInput {
+  func set(models data: [SearchModel]) {
+    self.data = data
+  }
+  
   func setSearchBar(focus: Bool) {
     if focus {
       searchBar.becomeFirstResponder()

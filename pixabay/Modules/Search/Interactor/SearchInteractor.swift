@@ -20,7 +20,7 @@ class SearchInteractor {
 
 extension SearchInteractor: SearchInteractorInput {
   func search(text: String) {
-    let urlString = "https://pixabay.com/api/?key=12057211-da8b15ee83b85dc84156454c8&q=\(text)&image_type=photo&pretty=true"
+    let urlString = "https://pixabay.com/api/?key=12057211-da8b15ee83b85dc84156454c8&q=\(text)&image_type=photo&pretty=true&page=1&per_page=10"
     
     guard let url = URL(string: urlString) else {
       presenter.didSearchFailure(message: "invalid URL")
@@ -37,8 +37,12 @@ extension SearchInteractor: SearchInteractorInput {
         self.presenter.didSearchFailure(message: "request fail")
       }
       do {
-        let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers)
-        self.presenter.didSearchSuccess(json: json as! Dictionary<String, Any?>)
+        let jsonObj = try JSONSerialization.jsonObject(with: data!)
+        guard let json = jsonObj as? [String: AnyObject], let data = json["hits"] as? [[String: AnyObject]] else {
+          self.presenter.didSearchFailure(message: "json error!")
+          return
+        }
+        self.presenter.didSearchSuccess(json: data)
       } catch {
         self.presenter.didSearchFailure(message: "fail to parse json!")
       }

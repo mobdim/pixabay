@@ -38,7 +38,7 @@ extension SearchPresenter: SearchInteractorOutput {
     print("fail: \(message ?? "error")")
   }
   
-  func didSearchSuccess(json: Dictionary<String, Any?>) {
+  func didSearchSuccess(json: [[String: AnyObject]]) {
     print("success: \(json)")
   }
 }

@@ -13,6 +13,6 @@ protocol SearchInteractorInput {
 }
 
 protocol SearchInteractorOutput {
-  func didSearchSuccess(json: Dictionary<String, Any?>)
+  func didSearchSuccess(json: [[String: AnyObject]])
   func didSearchFailure(message: String?)
 }

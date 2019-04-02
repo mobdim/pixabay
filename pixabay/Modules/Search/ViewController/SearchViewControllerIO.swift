@@ -10,6 +10,7 @@ import Foundation
 
 protocol SearchViewControllerInput {
   func setSearchBar(focus: Bool)
+  func set(models data: [SearchModel])
 }
 
 protocol SearchViewControllerOutput {
