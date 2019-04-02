@@ -19,6 +19,7 @@ class SearchCell: UITableViewCell {
   private var indexPath: IndexPath?
   
   var delegate: SearchCellProtocol?
+  var task: URLSessionTask?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -30,37 +31,36 @@ class SearchCell: UITableViewCell {
   
   override func prepareForReuse() {
     super.prepareForReuse()
+    task?.cancel()
     imageView?.image = nil
     textLabel?.text = nil
-    print("prepareForReuse: \(indexPath!)")
     indexPath = nil
   }
 }
 
 extension SearchCell {
   func configure(model data: ModelData, indexPath: IndexPath) {
-    print("configure: \(self.indexPath ?? IndexPath())")
     self.indexPath = indexPath
     switch(data) {
     case .some(let model):
-      print("... loading \(model.imageUrl) \(indexPath)")
-      UIImageView.load(urlString: model.imageUrl, completion: { [weak self] result in
+      task = UIImageView.load(urlString: model.imageUrl, completion: { [weak self] result in
         guard let self = self else {
           return
         }
         switch result {
         case .success(let data):
-          DispatchQueue.main.async {
-//            self.imageView?.image = UIImage(data: data, scale: 1.0)
-            if let delegate = self.delegate {
-              print("success loaded  \(indexPath)")
-              delegate.didLoaded(indexPath: self.indexPath!, image: UIImage(data: data, scale: 1.0)!)
+          DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+              return
             }
+            self.imageView?.image = UIImage(data: data)
+            self.setNeedsLayout()
           }
         case .failure(let error):
           print(error.localizedDescription)
         }
       })
+      task?.resume()
       textLabel?.text = model.tags
     default:
       textLabel?.text = "..."

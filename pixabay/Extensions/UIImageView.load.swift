@@ -10,10 +10,10 @@ import UIKit
 
 
 extension UIImageView {
-  static func load(urlString: String, completion: @escaping (Result<Data, DataError>) -> Void) {
+  static func load(urlString: String, completion: @escaping (Result<Data, DataError>) -> Void) -> URLSessionDataTask? {
     guard let url = URL(string: urlString) else {
       completion(.failure(.invalidURL))
-      return
+      return .none
     }
     
     let urlRequest = URLRequest(url: url)
@@ -26,6 +26,6 @@ extension UIImageView {
       
       completion(.success(data))
     }
-    task.resume()
+    return task
   }
 }
