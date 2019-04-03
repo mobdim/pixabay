@@ -10,6 +10,7 @@ import Foundation
 
 protocol SearchInteractorInput {
   func search(text: String, page: Int, per_page: Int)
+  func clearDB()
 }
 
 protocol SearchInteractorOutput {

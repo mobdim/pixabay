@@ -46,7 +46,9 @@ extension SearchInteractor: SearchInteractorInput {
           self.presenter.didSearchFailure(message: "json error!")
           return
         }
-        self.updateDB(json: data)
+        DispatchQueue.main.async {
+          self.updateDB(json: data)
+        }
         self.presenter.didSearchSuccess(json: data, totalHits: totalHits)
       } catch {
         self.presenter.didSearchFailure(message: "fail to parse json!")
@@ -55,10 +57,92 @@ extension SearchInteractor: SearchInteractorInput {
     }
     task.resume()
   }
+  
+  func clearDB() {    
+    guard let context = getViewContext() else { return }
+    
+    let entity_name = Photo.entity().name!
+    
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity_name)
+    fetchRequest.returnsObjectsAsFaults = false
+    do {
+//      let results = try context.fetch(fetchRequest)
+//      for object in results {
+//        guard let objectData = object as? NSManagedObject else { continue }
+//        context.delete(objectData)
+//      }
+      let objects = try context.fetch(fetchRequest) as? [NSManagedObject]
+      _ = objects.map{$0.map{context.delete($0)}}
+      saveContext()
+      print("DB cleared!")
+    } catch let error {
+      print("Detele all data in \(entity_name) error :", error)
+    }
+  }
 }
 
 private extension SearchInteractor {
   func updateDB(json: [[String: AnyObject]]) {
+    
+    _ = json.map{ createPhotoEntityBase(from: $0) }
+    do {
+      try getViewContext()?.save()
+    } catch let error {
+      print(error)
+    }
+    
+    loadPhoto(json: json)
+  }
+  
+  private func createPhotoEntityBase(from dictionary: [String: AnyObject]) -> NSManagedObject? {
+    
+    guard let context = getViewContext() else { return nil }
+    
+    if let photoEntity = NSEntityDescription.insertNewObject(forEntityName: Photo.entity().name!, into: context) as? Photo {
+      photoEntity.id = (dictionary["id"] as? Int64)!
+      photoEntity.tags = dictionary["tags"] as? String
+      print("add: \(photoEntity.id)")
+      return photoEntity
+    }
+    return nil
+  }
+  
+  private func loadPhoto(json: [[String: AnyObject]]) {
+    guard let context = getViewContext() else { return }
+    
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
+    
+    _ = json.map { dictionary in
+      let id = dictionary["id"] as! Int64
+      let imageUrl = dictionary["largeImageURL"] as! String
+      fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: id))
+      do {
+        let res = try context.fetch(fetchRequest)
+        if let obj = res.first as? NSManagedObject {
+          let task = load(urlString: imageUrl, completion: { result in
+            switch result {
+            case .success(let data):
+              DispatchQueue.main.async {
+                obj.setValue(data, forKey: #keyPath(Photo.photo))
+                do {
+                  try context.save()
+                  print("save image \(id) \(data)")
+                }
+                catch {
+                  print(error)
+                }
+              }
+            case .failure(let error):
+              print(error.localizedDescription)
+            }
+          })
+          task?.resume()
+        }
+      }
+      catch {
+        
+      }
+    }
     
   }
 }

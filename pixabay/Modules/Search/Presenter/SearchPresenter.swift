@@ -82,6 +82,7 @@ extension SearchPresenter: SearchViewControllerOutput {
     guard let searchText = searchText else {
       return
     }
+    interactor.clearDB()
     data.removeAll()
     controller.removeAllModels()
     self.controller.reloadData()
