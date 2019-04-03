@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 class SearchInteractor {
   let presenter: SearchInteractorOutput
@@ -45,6 +46,7 @@ extension SearchInteractor: SearchInteractorInput {
           self.presenter.didSearchFailure(message: "json error!")
           return
         }
+        self.updateDB(json: data)
         self.presenter.didSearchSuccess(json: data, totalHits: totalHits)
       } catch {
         self.presenter.didSearchFailure(message: "fail to parse json!")
@@ -53,6 +55,10 @@ extension SearchInteractor: SearchInteractorInput {
     }
     task.resume()
   }
-  
+}
 
+private extension SearchInteractor {
+  func updateDB(json: [[String: AnyObject]]) {
+    
+  }
 }
