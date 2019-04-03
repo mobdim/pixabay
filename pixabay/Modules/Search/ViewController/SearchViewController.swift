@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import CoreData
 
 class SearchViewController: UIViewController {
   let presenter: SearchViewControllerOutput
@@ -15,6 +15,7 @@ class SearchViewController: UIViewController {
   let searchBar = UISearchBar()
   let tableView: UITableView
   
+  private var images: [NSManagedObject] = []
   private var data = [SearchModel]()
   private var total = 0
   
@@ -77,6 +78,7 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    print("images.count: \(images.count)")
     return total
   }
   
@@ -94,7 +96,55 @@ extension SearchViewController: UITableViewDataSource {
       cell.configure(model: .some(model: data[indexPath.row]), indexPath: indexPath)
     }
     
+//    load(id: data[indexPath.row].id)
+    //save(model: data[indexPath.row])
+    
     return cell
+  }
+}
+
+extension SearchViewController {
+  func load(id: Int) {
+    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
+      return
+    }
+    
+    let managedContext = appdelegate.persistentContainer.viewContext
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
+    fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: id))
+    
+    do {
+      let result = try managedContext.fetch(fetchRequest)
+      guard let objs = result as? [NSManagedObject], objs.count == 1, let obj = objs.first else {
+        return
+      }
+      
+      
+      print("fetch: \(obj.value(forKey: #keyPath(Photo.id))!) - \(obj.value(forKey: #keyPath(Photo.tags))!)")
+      
+      
+    } catch {
+      print("fetch \(id) FAILED!!!")
+    }
+  }
+  
+  func save(model: SearchModel) {
+    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
+      return
+    }
+    
+    let managedContext = appdelegate.persistentContainer.viewContext
+    let photoEntity = NSEntityDescription.entity(forEntityName: Photo.entity().name!, in: managedContext)!
+    
+    let photo = NSManagedObject(entity: photoEntity, insertInto: managedContext)
+    photo.setValue(model.id, forKey: #keyPath(Photo.id))
+    photo.setValue(model.tags, forKey: #keyPath(Photo.tags))
+    do {
+      try managedContext.save()
+      print("coredata saved: \(model)")
+    } catch let error as NSError {
+      print("Could not save. \(error), \(error.userInfo)")
+    }
   }
 }
 
