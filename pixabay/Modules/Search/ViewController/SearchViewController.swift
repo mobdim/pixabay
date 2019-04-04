@@ -16,15 +16,13 @@ class SearchViewController: UIViewController {
   let tableView: UITableView
   
   private var images: [NSManagedObject] = []
-  private var data = [SearchModel]()
-  private var total = 0
   private var rowsCount = 0
   
   
   fileprivate lazy var fetchedResultsController: NSFetchedResultsController<Photo> = {
     let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
     
-    let sortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)
+    let sortDescriptor = NSSortDescriptor(key: #keyPath(Photo.createdAt), ascending: true)
     fetchRequest.sortDescriptors = [sortDescriptor]
     
     let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: getViewContext()!, sectionNameKeyPath: nil, cacheName: nil)
@@ -102,7 +100,6 @@ extension SearchViewController: UITableViewDataSource {
     
     let sectionInfo = sections[section]
     rowsCount = sectionInfo.numberOfObjects
-    print("rowsCount: \(rowsCount)")
     return rowsCount
   }
   
@@ -113,7 +110,6 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     configureCell(cell, at: indexPath)
-//    cell.delegate = self
     
     return cell
   }
@@ -123,9 +119,9 @@ extension SearchViewController: UITableViewDataSource {
 
 extension SearchViewController: UITableViewDataSourcePrefetching {
   func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-    print("prefetchRowsAt \(indexPaths)")
+//    print("prefetchRowsAt \(indexPaths)")
     if indexPaths.contains(where: isLoadingCell) {
-      print("didNeedFetch!!!!!!")
+//      print("didNeedFetch!!!!!!")
       presenter.didNeedFetch()
     }
   }
@@ -139,35 +135,9 @@ extension SearchViewController: UISearchBarDelegate {
   }
 }
 
-// MARK: - SearchCellProtocol
-
-extension SearchViewController: SearchCellProtocol {
-  func didLoaded(indexPath: IndexPath, image: UIImage) {
-    print("didLoaded: \(indexPath) \(image)")
-//    guard tableView.indexPathsForVisibleRows!.contains(indexPath) else {
-//      return
-//    }
-//    if let cell = tableView.cellForRow(at: indexPath) as? SearchCell {
-//      print("loaded: \(indexPath)")
-//
-////      cell.setNeedsLayout()
-//    }
-  }
-  
-  
-}
-
-
 // MARK: - SearchViewControllerInput
 
 extension SearchViewController: SearchViewControllerInput {
-  func set(models total: Int) {
-    self.total = total
-  }
-  
-  func removeAllModels() {
-    self.data.removeAll()
-  }
   
   func reloadData() {
     do {
@@ -177,19 +147,6 @@ extension SearchViewController: SearchViewControllerInput {
       print("Unable to Save Photo")
       print("\(fetchError), \(fetchError.localizedDescription)")
     }
-  }
-  
-  func reloadRows(indexes: [IndexPath]) {
-    print("reloadRows: \(indexes)")
-    let indexPathsToReload = visibleIndexPathsToReload(intersecting: indexes)
-    print("indexPathsToReload: \(indexPathsToReload)")
-    if indexPathsToReload.count > 0 {
-      tableView.reloadRows(at: indexPathsToReload, with: .none)
-    }
-  }
-  
-  func set(models data: [SearchModel]) {
-    self.data = data
   }
   
   func setSearchBar(focus: Bool) {
@@ -206,63 +163,8 @@ extension SearchViewController: SearchViewControllerInput {
 private extension SearchViewController {
   
   func isLoadingCell(for indexPath: IndexPath) -> Bool {
-    print("isLoadingCell: \(indexPath.row) | \(rowsCount - 1)")
+//    print("isLoadingCell: \(indexPath.row) | \(rowsCount - 1)")
     return indexPath.row >= rowsCount - 1
-  }
-  
-  func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
-    let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
-    print("indexPathsForVisibleRows: \(indexPathsForVisibleRows)")
-    let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
-    print("indexPathsIntersection: \(indexPathsIntersection)")
-    return Array(indexPathsIntersection)
-  }
-}
-
-// MARK: - load save coredata
-
-extension SearchViewController {
-  func load(id: Int) {
-    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
-      return
-    }
-    
-    let managedContext = appdelegate.persistentContainer.viewContext
-    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
-    fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: id))
-    
-    do {
-      let result = try managedContext.fetch(fetchRequest)
-      guard let objs = result as? [NSManagedObject], objs.count == 1, let obj = objs.first else {
-        return
-      }
-      
-      
-      print("fetch: \(obj.value(forKey: #keyPath(Photo.id))!) - \(obj.value(forKey: #keyPath(Photo.tags))!)")
-      
-      
-    } catch {
-      print("fetch \(id) FAILED!!!")
-    }
-  }
-  
-  func save(model: SearchModel) {
-    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
-      return
-    }
-    
-    let managedContext = appdelegate.persistentContainer.viewContext
-    let photoEntity = NSEntityDescription.entity(forEntityName: Photo.entity().name!, in: managedContext)!
-    
-    let photo = NSManagedObject(entity: photoEntity, insertInto: managedContext)
-    photo.setValue(model.id, forKey: #keyPath(Photo.id))
-    photo.setValue(model.tags, forKey: #keyPath(Photo.tags))
-    do {
-      try managedContext.save()
-      print("coredata saved: \(model)")
-    } catch let error as NSError {
-      print("Could not save. \(error), \(error.userInfo)")
-    }
   }
 }
 

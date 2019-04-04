@@ -86,14 +86,9 @@ private extension SearchInteractor {
     } catch let error {
       print("SearchInteractor fail save! \(error)")
     }
-    
-    
-    
-//    loadPhoto(json: json)
   }
   
-  private func createPhotoEntityBase(from dictionary: [String: AnyObject]) -> NSManagedObject? {
-    
+  private func createPhotoEntityBase(from dictionary: [String: AnyObject]) -> NSManagedObject? {    
     guard let context = getViewContext() else { return nil }
     
     if let photoEntity = NSEntityDescription.insertNewObject(forEntityName: Photo.entity().name!, into: context) as? Photo {
@@ -101,48 +96,8 @@ private extension SearchInteractor {
       photoEntity.tags = dictionary["tags"] as? String
       photoEntity.largeImageURL = dictionary["largeImageURL"] as? String
       photoEntity.createdAt = Date() as NSDate
-//      print("add: \(photoEntity.id) \(photoEntity.tags) \(photoEntity.createdAt)")
       return photoEntity
     }
     return nil
-  }
-  
-  private func loadPhoto(json: [[String: AnyObject]]) {
-    guard let context = getViewContext() else { return }
-    
-    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
-    
-    _ = json.map { dictionary in
-      let id = dictionary["id"] as! Int64
-      let imageUrl = dictionary["largeImageURL"] as! String
-      fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: id))
-      do {
-        let res = try context.fetch(fetchRequest)
-        if let obj = res.first as? NSManagedObject {
-          let task = load(urlString: imageUrl, completion: { result in
-            switch result {
-            case .success(let data):
-              DispatchQueue.main.async {
-                obj.setValue(data, forKey: #keyPath(Photo.photo))
-                do {
-                  try context.save()
-                  print("save image \(id) \(data)")
-                }
-                catch {
-                  print(error)
-                }
-              }
-            case .failure(let error):
-              print(error.localizedDescription)
-            }
-          })
-          task?.resume()
-        }
-      }
-      catch {
-        print("error pic: \(id)")
-      }
-    }
-    
   }
 }
