@@ -31,7 +31,6 @@ class SearchPresenter {
   }
   
   fileprivate var searchText = ""
-  var data = [SearchModel]()
   static let per_page = 20
   var currentPage = 1
 }
@@ -65,9 +64,7 @@ extension SearchPresenter: SearchViewControllerOutput {
       return
     }
     interactor.clearDB()
-    data.removeAll()
-    controller.removeAllModels()
-    self.controller.reloadData()
+    controller.reloadData()
     currentPage = 1
     self.searchText = searchText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).replacingOccurrences(of: " ", with: "+")
     interactor.search(text: self.searchText, page: currentPage, per_page: SearchPresenter.per_page)
@@ -75,17 +72,7 @@ extension SearchPresenter: SearchViewControllerOutput {
     controller.setSearchBar(focus: false)
   }
   
-  
   func didReady() {
     controller.setSearchBar(focus: true)
-  }
-}
-
-extension SearchPresenter {
-  func getReloadIndexes(from new_data: [SearchModel]) -> [IndexPath] {
-    let startIndex = data.count - new_data.count
-    let endIndex = startIndex + new_data.count
-    
-    return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
   }
 }

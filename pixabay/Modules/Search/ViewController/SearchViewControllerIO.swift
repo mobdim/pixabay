@@ -10,11 +10,6 @@ import Foundation
 
 protocol SearchViewControllerInput {
   func setSearchBar(focus: Bool)
-  func set(models data: [SearchModel])
-  func set(models total: Int)
-  func removeAllModels()
-  
-  func reloadRows(indexes: [IndexPath])
   func reloadData()
 }
 
