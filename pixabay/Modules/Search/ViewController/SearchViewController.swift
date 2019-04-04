@@ -312,5 +312,49 @@ extension SearchViewController: NSFetchedResultsControllerDelegate {
     let photo = fetchedResultsController.object(at: indexPath)
     
     cell.textLabel?.text = photo.tags
+    
+    if let data = photo.photo {
+      cell.imageView?.image = UIImage(data: data as Data)
+    } else {
+      let task = load(urlString: photo.largeImageURL!) { result in
+        switch result {
+        case .success(let data):
+          DispatchQueue.main.async {
+            let photo = self.fetchedResultsController.object(at: indexPath)
+            photo.photo = data as NSData
+//            if let context = getViewContext() {
+//              do {
+//                try context.save()
+//                print("Image save success!")
+//              } catch let error {
+//                print("Image fail save! \(error)")
+//              }
+//            }
+          }
+        case .failure(let error):
+          print(error.localizedDescription)
+        }
+      }
+      task?.resume()
+    }
+  }
+  
+  func load(urlString: String, completion: @escaping (Result<Data, DataError>) -> Void) -> URLSessionDataTask? {
+    guard let url = URL(string: urlString) else {
+      completion(.failure(.invalidURL))
+      return .none
+    }
+    
+    let urlRequest = URLRequest(url: url)
+    let task = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
+      
+      guard let data = data, error == nil else {
+        completion(.failure(.requestFail))
+        return
+      }
+      
+      completion(.success(data))
+    }
+    return task
   }
 }
