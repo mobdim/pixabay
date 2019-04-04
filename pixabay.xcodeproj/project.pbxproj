@@ -12,6 +12,10 @@
 		323F7F4E22537CF7003AED3A /* SearchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323F7F4D22537CF7003AED3A /* SearchCell.swift */; };
 		324089FD2253885C00464729 /* UIImageView.load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324089FC2253885C00464729 /* UIImageView.load.swift */; };
 		32408A0022538A4800464729 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324089FF22538A4800464729 /* NetworkError.swift */; };
+		3240C5732254DC67003187C4 /* Photo+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3240C5712254DC67003187C4 /* Photo+CoreDataClass.swift */; };
+		3240C5782254FE96003187C4 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3240C5772254FE96003187C4 /* CoreDataHelper.swift */; };
+		3240C57A2255615B003187C4 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3240C5792255615B003187C4 /* ImageHelper.swift */; };
+		3240C57E225628AE003187C4 /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3240C57D225628AE003187C4 /* Photo+CoreDataProperties.swift */; };
 		324CF59F2252A2C300B4D536 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324CF59E2252A2C300B4D536 /* AppDelegate.swift */; };
 		324CF5A72252A2C300B4D536 /* pixabay.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 324CF5A52252A2C300B4D536 /* pixabay.xcdatamodeld */; };
 		324CF5A92252A2C300B4D536 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 324CF5A82252A2C300B4D536 /* Assets.xcassets */; };
@@ -33,6 +37,10 @@
 		323F7F4D22537CF7003AED3A /* SearchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCell.swift; sourceTree = "<group>"; };
 		324089FC2253885C00464729 /* UIImageView.load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView.load.swift; sourceTree = "<group>"; };
 		324089FF22538A4800464729 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		3240C5712254DC67003187C4 /* Photo+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Photo+CoreDataClass.swift"; path = "pixabay/CoreData/Photo+CoreDataClass.swift"; sourceTree = "<group>"; };
+		3240C5772254FE96003187C4 /* CoreDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		3240C5792255615B003187C4 /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
+		3240C57D225628AE003187C4 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Photo+CoreDataProperties.swift"; path = "pixabay/CoreData/Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		324CF59B2252A2C300B4D536 /* pixabay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pixabay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		324CF59E2252A2C300B4D536 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		324CF5A62252A2C300B4D536 /* pixabay.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = pixabay.xcdatamodel; sourceTree = "<group>"; };
@@ -80,6 +88,8 @@
 			isa = PBXGroup;
 			children = (
 				324089FF22538A4800464729 /* NetworkError.swift */,
+				3240C5772254FE96003187C4 /* CoreDataHelper.swift */,
+				3240C5792255615B003187C4 /* ImageHelper.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -87,6 +97,8 @@
 		324CF5922252A2C300B4D536 = {
 			isa = PBXGroup;
 			children = (
+				3240C57D225628AE003187C4 /* Photo+CoreDataProperties.swift */,
+				3240C5712254DC67003187C4 /* Photo+CoreDataClass.swift */,
 				324CF59D2252A2C300B4D536 /* pixabay */,
 				324CF5B32252A2DB00B4D536 /* Rambafile */,
 				324CF59C2252A2C300B4D536 /* Products */,
@@ -253,10 +265,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3240C57E225628AE003187C4 /* Photo+CoreDataProperties.swift in Sources */,
 				323F7F4E22537CF7003AED3A /* SearchCell.swift in Sources */,
 				324CF59F2252A2C300B4D536 /* AppDelegate.swift in Sources */,
+				3240C5732254DC67003187C4 /* Photo+CoreDataClass.swift in Sources */,
 				324CF5A72252A2C300B4D536 /* pixabay.xcdatamodeld in Sources */,
+				3240C5782254FE96003187C4 /* CoreDataHelper.swift in Sources */,
 				DB6A457549ECBAC65564E117 /* SearchHeaderIO.swift in Sources */,
+				3240C57A2255615B003187C4 /* ImageHelper.swift in Sources */,
 				7E7174C04D31BB53294CF17C /* SearchHeader.swift in Sources */,
 				E56E9C54DF76DA0DD7D38014 /* SearchModel.swift in Sources */,
 				E3A0DC557E4F9EB38C954F7D /* SearchPresenter.swift in Sources */,

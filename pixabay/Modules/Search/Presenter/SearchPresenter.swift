@@ -39,33 +39,15 @@ class SearchPresenter {
 // MARK: - SearchInteractorOutput
 
 extension SearchPresenter: SearchInteractorOutput {
+  
   func didSearchFailure(message: String?) {
     print("fail: \(message ?? "error")")
   }
   
-  func didSearchSuccess(json: [[String: AnyObject]], totalHits: Int) {
-    var new_data = [SearchModel]()
-    for item in json {
-      guard let tags = item["tags"] as? String, let imageUrl = item["largeImageURL"] as? String, let id = item["id"] as? Int else {
-        continue
-      }
-      new_data.append(SearchModel(tags: tags, imageUrl: imageUrl, id: id))
-    }
-    
-    data += new_data
-    controller.set(models: totalHits)
-    controller.set(models: data)
-    let indexesToReload = getReloadIndexes(from: new_data)
-    
+  func didSearchSuccess() {
     DispatchQueue.main.async {
-//      self.controller.reloadRows(indexes: indexesToReload)
-      if self.currentPage == 1 {
-        self.controller.reloadData()
-      } else {
-        self.controller.reloadRows(indexes: indexesToReload)
-      }
+      self.controller.reloadData()
     }
-    
   }
 }
 
@@ -82,6 +64,7 @@ extension SearchPresenter: SearchViewControllerOutput {
     guard let searchText = searchText else {
       return
     }
+    interactor.clearDB()
     data.removeAll()
     controller.removeAllModels()
     self.controller.reloadData()

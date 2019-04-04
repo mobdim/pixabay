@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol SearchCellProtocol {
   func didLoaded(indexPath: IndexPath, image: UIImage)
@@ -21,7 +22,10 @@ class SearchCell: UITableViewCell {
   var delegate: SearchCellProtocol?
   var task: URLSessionTask?
   
+  private let context: NSManagedObjectContext
+  
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    context = ((UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext)!
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
   
@@ -43,6 +47,26 @@ extension SearchCell {
     self.indexPath = indexPath
     switch(data) {
     case .some(let model):
+      
+//      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
+//      fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: model.id))
+//      
+//      let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
+//        if let obj = (asynchronousFetchResult.finalResult as? [NSManagedObject])?.first {
+//          let id = obj.value(forKey: #keyPath(Photo.id))! as! Int
+//          let photo = obj.value(forKey: #keyPath(Photo.photo)) as! Data
+//        } else {
+//          
+//        }
+//      }
+//      
+//      do {
+//        try context.execute(asynchronousFetchRequest)
+//      } catch {
+//        let fetchError = error as NSError
+//        print("\(fetchError), \(fetchError.userInfo)")
+//      }
+      
       task = UIImageView.load(urlString: model.imageUrl, completion: { [weak self] result in
         guard let self = self else {
           return
