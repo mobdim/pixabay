@@ -92,6 +92,8 @@ class SearchViewController: UIViewController {
   
 }
 
+// MARK: - UITableViewDataSource
+
 extension SearchViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     guard let sections = fetchedResultsController.sections else {
@@ -112,77 +114,32 @@ extension SearchViewController: UITableViewDataSource {
     
     configureCell(cell, at: indexPath)
 //    cell.delegate = self
-//
-//    if isLoadingCell(for: indexPath) {
-//      cell.configure(model: .none, indexPath: indexPath)
-//    } else {
-//      cell.configure(model: .some(model: data[indexPath.row]), indexPath: indexPath)
-//    }
     
     return cell
   }
 }
 
-extension SearchViewController {
-  func load(id: Int) {
-    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
-      return
-    }
-    
-    let managedContext = appdelegate.persistentContainer.viewContext
-    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
-    fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: id))
-    
-    do {
-      let result = try managedContext.fetch(fetchRequest)
-      guard let objs = result as? [NSManagedObject], objs.count == 1, let obj = objs.first else {
-        return
-      }
-      
-      
-      print("fetch: \(obj.value(forKey: #keyPath(Photo.id))!) - \(obj.value(forKey: #keyPath(Photo.tags))!)")
-      
-      
-    } catch {
-      print("fetch \(id) FAILED!!!")
-    }
-  }
-  
-  func save(model: SearchModel) {
-    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
-      return
-    }
-    
-    let managedContext = appdelegate.persistentContainer.viewContext
-    let photoEntity = NSEntityDescription.entity(forEntityName: Photo.entity().name!, in: managedContext)!
-    
-    let photo = NSManagedObject(entity: photoEntity, insertInto: managedContext)
-    photo.setValue(model.id, forKey: #keyPath(Photo.id))
-    photo.setValue(model.tags, forKey: #keyPath(Photo.tags))
-    do {
-      try managedContext.save()
-      print("coredata saved: \(model)")
-    } catch let error as NSError {
-      print("Could not save. \(error), \(error.userInfo)")
-    }
-  }
-}
+// MARK: - UITableViewDataSourcePrefetching
 
 extension SearchViewController: UITableViewDataSourcePrefetching {
   func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
     print("prefetchRowsAt \(indexPaths)")
     if indexPaths.contains(where: isLoadingCell) {
+      print("didNeedFetch!!!!!!")
       presenter.didNeedFetch()
     }
   }
 }
 
+// MARK: - UISearchBarDelegate
 
 extension SearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     presenter.didClickSearchButton(searchText: searchBar.text)
   }
 }
+
+// MARK: - SearchCellProtocol
 
 extension SearchViewController: SearchCellProtocol {
   func didLoaded(indexPath: IndexPath, image: UIImage) {
@@ -244,10 +201,13 @@ extension SearchViewController: SearchViewControllerInput {
   }
 }
 
+// MARK: - No protocol
+
 private extension SearchViewController {
   
   func isLoadingCell(for indexPath: IndexPath) -> Bool {
-    return indexPath.row >= rowsCount
+    print("isLoadingCell: \(indexPath.row) | \(rowsCount - 1)")
+    return indexPath.row >= rowsCount - 1
   }
   
   func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
@@ -258,6 +218,55 @@ private extension SearchViewController {
     return Array(indexPathsIntersection)
   }
 }
+
+// MARK: - load save coredata
+
+extension SearchViewController {
+  func load(id: Int) {
+    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
+      return
+    }
+    
+    let managedContext = appdelegate.persistentContainer.viewContext
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Photo.entity().name!)
+    fetchRequest.predicate = NSPredicate(format: "id = %@", NSNumber(value: id))
+    
+    do {
+      let result = try managedContext.fetch(fetchRequest)
+      guard let objs = result as? [NSManagedObject], objs.count == 1, let obj = objs.first else {
+        return
+      }
+      
+      
+      print("fetch: \(obj.value(forKey: #keyPath(Photo.id))!) - \(obj.value(forKey: #keyPath(Photo.tags))!)")
+      
+      
+    } catch {
+      print("fetch \(id) FAILED!!!")
+    }
+  }
+  
+  func save(model: SearchModel) {
+    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else {
+      return
+    }
+    
+    let managedContext = appdelegate.persistentContainer.viewContext
+    let photoEntity = NSEntityDescription.entity(forEntityName: Photo.entity().name!, in: managedContext)!
+    
+    let photo = NSManagedObject(entity: photoEntity, insertInto: managedContext)
+    photo.setValue(model.id, forKey: #keyPath(Photo.id))
+    photo.setValue(model.tags, forKey: #keyPath(Photo.tags))
+    do {
+      try managedContext.save()
+      print("coredata saved: \(model)")
+    } catch let error as NSError {
+      print("Could not save. \(error), \(error.userInfo)")
+    }
+  }
+}
+
+// MARK: - NSFetchedResultsControllerDelegate
 
 extension SearchViewController: NSFetchedResultsControllerDelegate {
   func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
