@@ -18,6 +18,22 @@ class SearchViewController: UIViewController {
   private var images: [NSManagedObject] = []
   private var data = [SearchModel]()
   private var total = 0
+  private var rowsCount = 0
+  
+  
+  fileprivate lazy var fetchedResultsController: NSFetchedResultsController<Photo> = {
+    let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+    
+    let sortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)
+    fetchRequest.sortDescriptors = [sortDescriptor]
+    
+    let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: getViewContext()!, sectionNameKeyPath: nil, cacheName: nil)
+    
+    fetchedResultsController.delegate = self
+    
+    return fetchedResultsController
+  }()
+  
   
   override func loadView() {
     super.loadView()
@@ -78,8 +94,14 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    print("images.count: \(images.count)")
-    return total
+    guard let sections = fetchedResultsController.sections else {
+      return 0
+    }
+    
+    let sectionInfo = sections[section]
+    rowsCount = sectionInfo.numberOfObjects
+    print("rowsCount: \(rowsCount)")
+    return rowsCount
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -88,16 +110,14 @@ extension SearchViewController: UITableViewDataSource {
       return UITableViewCell(frame: .zero)
     }
     
-    cell.delegate = self
-    
-    if isLoadingCell(for: indexPath) {
-      cell.configure(model: .none, indexPath: indexPath)
-    } else {
-      cell.configure(model: .some(model: data[indexPath.row]), indexPath: indexPath)
-    }
-    
-//    load(id: data[indexPath.row].id)
-    //save(model: data[indexPath.row])
+    configureCell(cell, at: indexPath)
+//    cell.delegate = self
+//
+//    if isLoadingCell(for: indexPath) {
+//      cell.configure(model: .none, indexPath: indexPath)
+//    } else {
+//      cell.configure(model: .some(model: data[indexPath.row]), indexPath: indexPath)
+//    }
     
     return cell
   }
@@ -193,7 +213,13 @@ extension SearchViewController: SearchViewControllerInput {
   }
   
   func reloadData() {
-    tableView.reloadData()
+    do {
+      try fetchedResultsController.performFetch()
+    } catch {
+      let fetchError = error as NSError
+      print("Unable to Save Photo")
+      print("\(fetchError), \(fetchError.localizedDescription)")
+    }
   }
   
   func reloadRows(indexes: [IndexPath]) {
@@ -221,7 +247,7 @@ extension SearchViewController: SearchViewControllerInput {
 private extension SearchViewController {
   
   func isLoadingCell(for indexPath: IndexPath) -> Bool {
-    return indexPath.row >= data.count
+    return indexPath.row >= rowsCount
   }
   
   func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
@@ -230,5 +256,52 @@ private extension SearchViewController {
     let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
     print("indexPathsIntersection: \(indexPathsIntersection)")
     return Array(indexPathsIntersection)
+  }
+}
+
+extension SearchViewController: NSFetchedResultsControllerDelegate {
+  func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    tableView.beginUpdates()
+  }
+  
+  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    tableView.endUpdates()
+  }
+  
+  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    switch (type) {
+      case .insert:
+        if let indexPath = newIndexPath {
+          tableView.insertRows(at: [indexPath], with: .fade)
+        }
+        break;
+      case .delete:
+        if let indexPath = indexPath {
+          tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        break;
+      case .update:
+        if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
+          configureCell(cell, at: indexPath)
+        }
+        break;
+      case .move:
+        if let indexPath = indexPath {
+          tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        
+        if let newIndexPath = newIndexPath {
+          tableView.insertRows(at: [newIndexPath], with: .fade)
+        }
+        break;
+      @unknown default:
+        fatalError("unknown!")
+    }
+  }
+  
+  func configureCell(_ cell: UITableViewCell, at indexPath: IndexPath) {
+    let photo = fetchedResultsController.object(at: indexPath)
+    
+    cell.textLabel?.text = photo.tags
   }
 }

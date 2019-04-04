@@ -14,6 +14,6 @@ protocol SearchInteractorInput {
 }
 
 protocol SearchInteractorOutput {
-  func didSearchSuccess(json: [[String: AnyObject]], totalHits: Int)
+  func didSearchSuccess()
   func didSearchFailure(message: String?)
 }

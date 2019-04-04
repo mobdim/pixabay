@@ -42,14 +42,14 @@ extension SearchInteractor: SearchInteractorInput {
       }
       do {
         let jsonObj = try JSONSerialization.jsonObject(with: data!)
-        guard let json = jsonObj as? [String: AnyObject], let data = json["hits"] as? [[String: AnyObject]], let totalHits = json["totalHits"] as? Int else {
+        guard let json = jsonObj as? [String: AnyObject], let data = json["hits"] as? [[String: AnyObject]] else {
           self.presenter.didSearchFailure(message: "json error!")
           return
         }
         DispatchQueue.main.async {
           self.updateDB(json: data)
+          self.presenter.didSearchSuccess()
         }
-        self.presenter.didSearchSuccess(json: data, totalHits: totalHits)
       } catch {
         self.presenter.didSearchFailure(message: "fail to parse json!")
       }
@@ -66,11 +66,6 @@ extension SearchInteractor: SearchInteractorInput {
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity_name)
     fetchRequest.returnsObjectsAsFaults = false
     do {
-//      let results = try context.fetch(fetchRequest)
-//      for object in results {
-//        guard let objectData = object as? NSManagedObject else { continue }
-//        context.delete(objectData)
-//      }
       let objects = try context.fetch(fetchRequest) as? [NSManagedObject]
       _ = objects.map{$0.map{context.delete($0)}}
       saveContext()
@@ -87,11 +82,14 @@ private extension SearchInteractor {
     _ = json.map{ createPhotoEntityBase(from: $0) }
     do {
       try getViewContext()?.save()
+      print("SearchInteractor save success!")
     } catch let error {
-      print(error)
+      print("SearchInteractor fail save! \(error)")
     }
     
-    loadPhoto(json: json)
+    
+    
+//    loadPhoto(json: json)
   }
   
   private func createPhotoEntityBase(from dictionary: [String: AnyObject]) -> NSManagedObject? {
@@ -101,7 +99,9 @@ private extension SearchInteractor {
     if let photoEntity = NSEntityDescription.insertNewObject(forEntityName: Photo.entity().name!, into: context) as? Photo {
       photoEntity.id = (dictionary["id"] as? Int64)!
       photoEntity.tags = dictionary["tags"] as? String
-      print("add: \(photoEntity.id)")
+      photoEntity.largeImageURL = dictionary["largeImageURL"] as? String
+      photoEntity.createdAt = Date() as NSDate
+//      print("add: \(photoEntity.id) \(photoEntity.tags) \(photoEntity.createdAt)")
       return photoEntity
     }
     return nil
@@ -140,7 +140,7 @@ private extension SearchInteractor {
         }
       }
       catch {
-        
+        print("error pic: \(id)")
       }
     }
     
